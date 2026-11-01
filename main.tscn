@@ -20,7 +20,9 @@ metadata/_custom_type_script = "uid://boqb3ro2iyp4l"
 layout_mode = 2
 text = "Scan"
 
-[node name="Timer" type="Timer" parent="." unique_id=1022314326]
+[node name="ScanTimeout" type="Timer" parent="." unique_id=1022314326]
+wait_time = 10.0
+one_shot = true
 
 [node name="DevicesContainer" type="HBoxContainer" parent="." unique_id=1023855629]
 layout_mode = 2

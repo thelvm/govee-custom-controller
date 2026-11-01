@@ -22,6 +22,13 @@ func update_device_view():
 		device_value.text = govee_device.device
 
 
+func set_power(power: bool):
+	if power:
+		turn_on()
+	else:
+		turn_off()
+
+
 func turn_on():
 	if govee_device:
 		govee_device.turn_on()
@@ -44,6 +51,10 @@ func set_color(color: Color):
 func handle_temperature_slider(value_changed: bool):
 	if value_changed:
 		govee_device.set_temperature(temperature_slider.value)
+
+
+func request_devce_status():
+	govee_device.request_device_status()
 
 
 func _set_govee_device(new_govee_device: GoveeDevice):

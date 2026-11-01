@@ -102,3 +102,15 @@ func set_temperature(value: float) -> void:
 	
 	var command_string := JSON.stringify(command)
 	command_sender.put_packet(command_string.to_ascii_buffer())
+
+
+func request_device_status() -> void:
+	var command := {
+		"msg": {
+			"cmd": "devStatus",
+			"data": {}
+		}
+	}
+	
+	var command_string := JSON.stringify(command)
+	command_sender.put_packet(command_string.to_ascii_buffer())
