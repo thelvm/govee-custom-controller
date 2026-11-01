@@ -63,6 +63,7 @@ text = "On/Off"
 horizontal_alignment = 2
 
 [node name="OnOffButton" type="CheckButton" parent="DeviceControls" unique_id=212308071]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 0
 
@@ -86,6 +87,7 @@ text = "Color"
 horizontal_alignment = 2
 
 [node name="ColorPickerButton" type="ColorPickerButton" parent="DeviceControls" unique_id=1683170465]
+unique_name_in_owner = true
 layout_mode = 2
 text = "Color"
 edit_alpha = false
@@ -115,4 +117,4 @@ text = "Request status"
 [connection signal="drag_ended" from="DeviceControls/BrightnessSlider" to="." method="handle_brightness_slider"]
 [connection signal="color_changed" from="DeviceControls/ColorPickerButton" to="." method="set_color"]
 [connection signal="drag_ended" from="DeviceControls/TemperatureSlider" to="." method="handle_temperature_slider"]
-[connection signal="pressed" from="DeviceControls/RequestStatusButton" to="." method="request_devce_status"]
+[connection signal="pressed" from="DeviceControls/RequestStatusButton" to="." method="request_device_status"]

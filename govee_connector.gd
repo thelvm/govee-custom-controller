@@ -18,7 +18,11 @@ func _ready() -> void:
 	setup_listener()
 
 
-func configure_valid_addresses():
+func _process(_delta: float) -> void:
+	handle_listeners()
+
+
+func configure_valid_addresses() -> void:
 	valid_addresses.clear()
 	for interface in IP.get_local_interfaces():
 		for address in interface["addresses"]:
@@ -45,7 +49,7 @@ func setup_scanners() -> void:
 		scanners.append(scanner)
 
 
-func scan_available_devices():
+func scan_available_devices() -> void:
 	var command := {
 		"msg": {
 			"cmd": "scan",
@@ -63,28 +67,36 @@ func scan_available_devices():
 			print("Sending scan request")
 
 
-func handle_listeners():
+func handle_listeners() -> void:
 	for listener in listeners:
 		if listener.is_bound():
 			if listener.get_available_packet_count() > 0:
 				var raw_packet := listener.get_packet()
-				var from_address := listener.get_packet_ip()
+				var packet_ip := listener.get_packet_ip()
 				var packet = JSON.parse_string(raw_packet.get_string_from_ascii())
-				print("ip: " + from_address + " data: ")
 				if packet:
-					if packet["msg"]["data"]:
-						print(packet["msg"])
 					if packet["msg"]["cmd"] == "scan":
-						var device_already_mapped := false
+						process_scan_response(packet)
+					if packet["msg"]["cmd"] == "devStatus":
 						for device in devices:
-							if device.ip == packet["msg"]["data"]["ip"]:
-								device_already_mapped = true
-								break
-						if not device_already_mapped:
-							var new_device = GoveeDevice.from_scan_response(packet)
-							devices.append(new_device)
-							devices_changed.emit()
+							if device.ip == packet_ip:
+								print("Status update received from " + packet_ip)
+								device.update_device_status_from_response(packet)
 
 
-func _process(_delta: float) -> void:
-	handle_listeners()
+func process_scan_response(response: Dictionary) -> void:
+	var device_already_mapped := false
+	
+	for device in devices:
+		if device.device == response["msg"]["data"]["device"]:
+			print("Device " + response["msg"]["data"]["device"] + " already mapped. Updating details")
+			device.ip = response["msg"]["data"]["ip"]
+			device.sku = response["msg"]["data"]["sku"]
+			device_already_mapped = true
+			break
+	
+	if not device_already_mapped:
+		print("New device detected. Adding " + response["msg"]["data"]["device"])
+		var new_device = GoveeDevice.from_scan_response(response)
+		devices.append(new_device)
+		devices_changed.emit()

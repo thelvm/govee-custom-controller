@@ -2,6 +2,7 @@ extends BoxContainer
 
 @onready var govee_connector: GoveeConnector = $GoveeConnector
 @onready var devices_container: HBoxContainer = $DevicesContainer
+
 const DEVICE_VIEW = preload("uid://fj80gipotni7")
 
 

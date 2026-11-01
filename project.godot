@@ -13,6 +13,7 @@ config_version=5
 config/name="Govee Custom Controller"
 run/main_scene="uid://mrkqbib1mkok"
 config/features=PackedStringArray("4.8", "GL Compatibility")
+run/low_processor_mode=true
 config/icon="res://icon.svg"
 
 [display]

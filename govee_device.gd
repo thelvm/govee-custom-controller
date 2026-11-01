@@ -1,20 +1,22 @@
 class_name GoveeDevice
-
 extends RefCounted
 
-var ip: String = "" : set = _set_ip
-var device: String = ""
-var sku: String = ""
-#var color: Color = Color.BLACK
-#var brightness: float = 0.0
+signal device_status_updated
+
+@export_storage var friendly: String = ""
+@export_storage var device: String = ""
+@export_storage var ip: String = "" : set = _set_ip
+@export_storage var sku: String = ""
 
 var command_sender := PacketPeerUDP.new()
+var device_status := DeviceStatus.new()
 
-
+## Creates a new [GoveeDevice] from a scan response packet 
 static func from_scan_response(scan_response: Variant) -> GoveeDevice:
 	var new_device = GoveeDevice.new()
-	new_device.ip = scan_response["msg"]["data"]["ip"]
+	new_device.friendly = scan_response["msg"]["data"]["device"]
 	new_device.device = scan_response["msg"]["data"]["device"]
+	new_device.ip = scan_response["msg"]["data"]["ip"]
 	new_device.sku = scan_response["msg"]["data"]["sku"]
 	return new_device
 
@@ -22,6 +24,7 @@ static func from_scan_response(scan_response: Variant) -> GoveeDevice:
 func _set_ip(new_ip: String) -> void:
 	ip = new_ip
 	command_sender.set_dest_address(ip, 4003)
+	request_device_status()
 
 
 func turn_on() -> void:
@@ -114,3 +117,7 @@ func request_device_status() -> void:
 	
 	var command_string := JSON.stringify(command)
 	command_sender.put_packet(command_string.to_ascii_buffer())
+
+func update_device_status_from_response(response) -> void:
+	device_status = DeviceStatus.from_device_status_response(response)
+	device_status_updated.emit()
