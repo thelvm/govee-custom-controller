@@ -1,0 +1,100 @@
+[gd_scene format=3 uid="uid://fj80gipotni7"]
+
+[ext_resource type="Script" uid="uid://c3utl4ctdnfkh" path="res://device_view.gd" id="1_hd5fu"]
+
+[node name="DeviceView" type="BoxContainer" unique_id=901262794]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+vertical = true
+script = ExtResource("1_hd5fu")
+
+[node name="DeviceInfo" type="BoxContainer" parent="." unique_id=524145780]
+layout_mode = 2
+
+[node name="Labels" type="VBoxContainer" parent="DeviceInfo" unique_id=627599800]
+layout_mode = 2
+
+[node name="IpLabel" type="Label" parent="DeviceInfo/Labels" unique_id=775200414]
+unique_name_in_owner = true
+layout_mode = 2
+text = "IP:"
+horizontal_alignment = 2
+
+[node name="SkuLabel" type="Label" parent="DeviceInfo/Labels" unique_id=1320392093]
+unique_name_in_owner = true
+layout_mode = 2
+text = "SKU:"
+horizontal_alignment = 2
+
+[node name="DeviceLabel" type="Label" parent="DeviceInfo/Labels" unique_id=919102080]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Device:"
+horizontal_alignment = 2
+
+[node name="Values" type="VBoxContainer" parent="DeviceInfo" unique_id=1724296027]
+layout_mode = 2
+
+[node name="IpValue" type="Label" parent="DeviceInfo/Values" unique_id=819585778]
+unique_name_in_owner = true
+layout_mode = 2
+text = "123.456.789.012"
+
+[node name="SkuValue" type="Label" parent="DeviceInfo/Values" unique_id=2067462489]
+unique_name_in_owner = true
+layout_mode = 2
+text = "AB12"
+
+[node name="DeviceValue" type="Label" parent="DeviceInfo/Values" unique_id=1465848191]
+unique_name_in_owner = true
+layout_mode = 2
+text = "FF:FF:FF:FF:FF:FF:FF:FF"
+
+[node name="DeviceControls" type="HBoxContainer" parent="." unique_id=640513271]
+layout_mode = 2
+
+[node name="OnButton" type="Button" parent="DeviceControls" unique_id=786915502]
+layout_mode = 2
+text = "On"
+
+[node name="OffButton" type="Button" parent="DeviceControls" unique_id=1863075151]
+layout_mode = 2
+text = "Off"
+
+[node name="BrightnessSlider" type="HSlider" parent="DeviceControls" unique_id=445006441]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+rounded = true
+scrollable = false
+tick_count = 5
+ticks_on_borders = true
+
+[node name="HBoxContainer" type="HBoxContainer" parent="DeviceControls" unique_id=1881632799]
+layout_mode = 2
+
+[node name="ColorPickerButton" type="ColorPickerButton" parent="DeviceControls" unique_id=1683170465]
+layout_mode = 2
+text = "Color"
+edit_alpha = false
+edit_intensity = false
+
+[node name="TemperatureSlider" type="HSlider" parent="DeviceControls" unique_id=316333060]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 2000.0
+max_value = 9000.0
+step = 100.0
+value = 5800.0
+rounded = true
+scrollable = false
+
+[connection signal="pressed" from="DeviceControls/OnButton" to="." method="turn_on"]
+[connection signal="pressed" from="DeviceControls/OffButton" to="." method="turn_off"]
+[connection signal="drag_ended" from="DeviceControls/BrightnessSlider" to="." method="handle_brightness_slider"]
+[connection signal="color_changed" from="DeviceControls/ColorPickerButton" to="." method="set_color"]
+[connection signal="drag_ended" from="DeviceControls/TemperatureSlider" to="." method="handle_temperature_slider"]
