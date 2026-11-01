@@ -4,34 +4,45 @@ extends Node
 signal devices_changed
 signal device_status_received()
 
-var scanner := PacketPeerUDP.new()
-var listener := PacketPeerUDP.new()
+var valid_addresses: Array[String]
 
-var connected_interface_names: Array[String]
+var scanners: Array[PacketPeerUDP]
+var listeners: Array[PacketPeerUDP]
+
 var devices: Array[GoveeDevice]
 
 
 func _ready() -> void:
-	setup_scanner()
+	configure_valid_addresses()
+	setup_scanners()
 	setup_listener()
 
 
-func setup_listener() -> void:
-	listener.bind(4002)
-
-
-func setup_scanner() -> void:
-	connected_interface_names.clear()
-	devices.clear()
-	
+func configure_valid_addresses():
+	valid_addresses.clear()
 	for interface in IP.get_local_interfaces():
-		var join_error = scanner.join_multicast_group("239.255.255.250", interface["name"])
-		if join_error:
-			printerr("Could not join multicast group on :" + interface["friendly"])
-		if not join_error:
-			print("Joined multicast group on: " + interface["friendly"])
-	scanner.set_broadcast_enabled(true)
-	scanner.set_dest_address("239.255.255.250", 4001)
+		for address in interface["addresses"]:
+			if (address as String).begins_with("192.168"):
+				valid_addresses.append(address)
+
+
+func setup_listener() -> void:
+	listeners.clear()
+	
+	for valid_address in valid_addresses:
+		var listener := PacketPeerUDP.new()
+		listener.bind(4002, valid_address)
+		listeners.append(listener)
+
+
+func setup_scanners() -> void:
+	scanners.clear()
+	
+	for valid_address in valid_addresses:
+		var scanner := PacketPeerUDP.new()
+		scanner.bind(0, valid_address)
+		scanner.set_dest_address("239.255.255.250", 4001)
+		scanners.append(scanner)
 
 
 func scan_available_devices():
@@ -39,30 +50,41 @@ func scan_available_devices():
 		"msg": {
 			"cmd": "scan",
 			"data": {
-					"account_topic":"reserve"
-				}
-		}
+				"account_topic": "reserve"
+			}
+		},
 	}
 	var command_string = JSON.stringify(command)
-	var error := scanner.put_packet(command_string.to_ascii_buffer())
-	scanner.put_packet("Random packet".to_ascii_buffer())
-	if error:
-		printerr("Something happened when trying to scan devices")
-	else:
-		print("Sending scan request")
+	for scanner in scanners:
+		var error := scanner.put_packet(command_string.to_ascii_buffer())
+		if error:
+			printerr("Something happened when trying to scan devices")
+		else:
+			print("Sending scan request")
+
+
+func handle_listeners():
+	for listener in listeners:
+		if listener.is_bound():
+			if listener.get_available_packet_count() > 0:
+				var raw_packet := listener.get_packet()
+				var from_address := listener.get_packet_ip()
+				var packet = JSON.parse_string(raw_packet.get_string_from_ascii())
+				print("ip: " + from_address + " data: ")
+				if packet:
+					if packet["msg"]["data"]:
+						print(packet["msg"])
+					if packet["msg"]["cmd"] == "scan":
+						var device_already_mapped := false
+						for device in devices:
+							if device.ip == packet["msg"]["data"]["ip"]:
+								device_already_mapped = true
+								break
+						if not device_already_mapped:
+							var new_device = GoveeDevice.from_scan_response(packet)
+							devices.append(new_device)
+							devices_changed.emit()
 
 
 func _process(_delta: float) -> void:
-	if listener.is_bound():
-		if listener.get_available_packet_count() > 0:
-			var raw_packet := listener.get_packet()
-			var from_address := listener.get_packet_ip()
-			var packet = JSON.parse_string(raw_packet.get_string_from_ascii())
-			print("ip: " + from_address + " data: ")
-			if packet:
-				if packet["msg"]["data"]:
-					print(packet["msg"]["data"])
-				if packet["msg"]["cmd"] == "scan":
-					var new_device = GoveeDevice.from_scan_response(packet)
-					devices.append(new_device)
-					devices_changed.emit()
+	handle_listeners()
