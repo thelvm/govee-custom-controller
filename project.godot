@@ -8,16 +8,23 @@
 
 config_version=5
 
+[accessibility]
+
+general/accessibility_support=2
+
 [application]
 
 config/name="Govee Custom Controller"
+config/version="0.1.0"
 run/main_scene="uid://mrkqbib1mkok"
 config/features=PackedStringArray("4.8", "GL Compatibility")
 run/low_processor_mode=true
+run/delta_smoothing=false
 config/icon="res://icon.svg"
 
 [display]
 
+window/energy_saving/keep_screen_on=false
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 
