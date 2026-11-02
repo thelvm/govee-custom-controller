@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://fj80gipotni7"]
 
-[ext_resource type="Script" uid="uid://c3utl4ctdnfkh" path="res://device_view.gd" id="1_hd5fu"]
+[ext_resource type="Script" uid="uid://c3utl4ctdnfkh" path="res://scenes/device_view.gd" id="1_px3n8"]
 
 [node name="DeviceView" type="BoxContainer" unique_id=901262794]
 anchors_preset = 15
@@ -9,7 +9,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 vertical = true
-script = ExtResource("1_hd5fu")
+script = ExtResource("1_px3n8")
 
 [node name="DeviceInfo" type="BoxContainer" parent="." unique_id=524145780]
 layout_mode = 2

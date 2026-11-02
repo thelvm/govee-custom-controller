@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://mrkqbib1mkok"]
 
-[ext_resource type="Script" uid="uid://csmjxix67y52s" path="res://main.gd" id="1_0xm2m"]
-[ext_resource type="Script" uid="uid://boqb3ro2iyp4l" path="res://govee_connector.gd" id="1_ig7tw"]
+[ext_resource type="Script" uid="uid://csmjxix67y52s" path="res://scenes/main.gd" id="1_0wfyh"]
+[ext_resource type="Script" uid="uid://boqb3ro2iyp4l" path="res://scripts/govee_connector.gd" id="2_sugp2"]
 
 [node name="Control" type="BoxContainer" unique_id=1901124921]
 anchors_preset = 15
@@ -10,11 +10,11 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 vertical = true
-script = ExtResource("1_0xm2m")
+script = ExtResource("1_0wfyh")
 
 [node name="GoveeConnector" type="Node" parent="." unique_id=754795679]
 unique_name_in_owner = true
-script = ExtResource("1_ig7tw")
+script = ExtResource("2_sugp2")
 metadata/_custom_type_script = "uid://boqb3ro2iyp4l"
 
 [node name="ScanButton" type="Button" parent="." unique_id=1634423330]
