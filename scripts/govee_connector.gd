@@ -2,7 +2,7 @@ class_name GoveeConnector
 extends Node
 
 signal devices_changed
-signal device_status_received()
+signal device_status_received
 
 var valid_addresses: Array[String]
 
@@ -16,6 +16,7 @@ func _ready() -> void:
 	configure_valid_addresses()
 	setup_scanners()
 	setup_listener()
+	load_known_devices()
 
 
 func _process(_delta: float) -> void:
@@ -47,6 +48,23 @@ func setup_scanners() -> void:
 		scanner.bind(0, valid_address)
 		scanner.set_dest_address("239.255.255.250", 4001)
 		scanners.append(scanner)
+
+
+func load_known_devices() -> void:
+	if not FileAccess.file_exists("user://devices.json"):
+		return
+	
+	print("Loading known devices")
+	var devices_file := FileAccess.open("user://devices.json", FileAccess.READ)
+	var devices_object := JSON.parse_string(devices_file.get_as_text()) as Dictionary
+	if not devices_object:
+		print("Error loading known devices")
+		return
+	
+	for device_data in devices_object["devices"]:
+		devices.append(GoveeDevice.from_device_data(device_data))
+	
+	devices_changed.emit()
 
 
 func scan_available_devices() -> void:
@@ -87,16 +105,37 @@ func handle_listeners() -> void:
 func process_scan_response(response: Dictionary) -> void:
 	var device_already_mapped := false
 	
+	var device_view_requires_update := false
 	for device in devices:
 		if device.device == response["msg"]["data"]["device"]:
 			print("Device " + response["msg"]["data"]["device"] + " already mapped. Updating details")
 			device.ip = response["msg"]["data"]["ip"]
 			device.sku = response["msg"]["data"]["sku"]
 			device_already_mapped = true
+			device_view_requires_update = true
 			break
 	
 	if not device_already_mapped:
 		print("New device detected. Adding " + response["msg"]["data"]["device"])
 		var new_device = GoveeDevice.from_scan_response(response)
+		new_device.device_info_updated.connect(save_devices)
 		devices.append(new_device)
+		device_view_requires_update = true
+	
+	if device_view_requires_update:
 		devices_changed.emit()
+
+
+func save_devices() -> void:
+	var data := {
+		"version": 1
+	}
+	
+	var devices_array := []
+	for device in devices:
+		devices_array.append(device.to_dict())
+	
+	data["devices"] = devices_array
+	
+	var devices_file := FileAccess.open("user://devices.json", FileAccess.WRITE)
+	devices_file.store_string(JSON.stringify(data))

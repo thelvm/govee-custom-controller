@@ -39,5 +39,6 @@ autostart = true
 [connection signal="pressed" from="ScanButton" to="GoveeConnector" method="scan_available_devices"]
 [connection signal="pressed" from="ScanButton" to="ScanTimeout" method="start"]
 [connection signal="pressed" from="ScanButton" to="ScanButton" method="set_disabled" binds= [true]]
+[connection signal="timeout" from="ScanTimeout" to="GoveeConnector" method="save_devices"]
 [connection signal="timeout" from="ScanTimeout" to="ScanButton" method="set_disabled" binds= [false]]
 [connection signal="timeout" from="InitialScanDelayTimer" to="GoveeConnector" method="scan_available_devices"]

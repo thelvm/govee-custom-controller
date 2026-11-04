@@ -15,8 +15,10 @@ general/accessibility_support=2
 [application]
 
 config/name="Govee Custom Controller"
-config/version="0.1.0"
+config/version="0.2"
 run/main_scene="uid://mrkqbib1mkok"
+config/use_custom_user_dir=true
+config/custom_user_dir_name="Govee Custom Controller"
 config/features=PackedStringArray("4.8", "GL Compatibility")
 run/low_processor_mode=true
 run/delta_smoothing=false

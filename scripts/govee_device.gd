@@ -2,14 +2,17 @@ class_name GoveeDevice
 extends RefCounted
 
 signal device_status_updated
+signal device_info_updated
 
-@export_storage var friendly: String = ""
-@export_storage var device: String = ""
-@export_storage var ip: String = "" : set = _set_ip
-@export_storage var sku: String = ""
+var friendly: String = ""
+var device: String = ""
+var ip: String = "" : set = _set_ip
+var sku: String = ""
+
+var is_online: bool = false
+var device_status := DeviceStatus.new()
 
 var command_sender := PacketPeerUDP.new()
-var device_status := DeviceStatus.new()
 
 ## Creates a new [GoveeDevice] from a scan response packet 
 static func from_scan_response(scan_response: Variant) -> GoveeDevice:
@@ -21,10 +24,18 @@ static func from_scan_response(scan_response: Variant) -> GoveeDevice:
 	return new_device
 
 
+static func from_device_data(device_data: Dictionary) -> GoveeDevice:
+	var new_device = GoveeDevice.new()
+	new_device.friendly = device_data["friendly"]
+	new_device.device = device_data["device"]
+	new_device.ip = device_data["ip"]
+	new_device.sku = device_data["sku"]
+	return new_device
+
+
 func _set_ip(new_ip: String) -> void:
 	ip = new_ip
 	command_sender.set_dest_address(ip, 4003)
-	request_device_status()
 
 
 func turn_on() -> void:
@@ -117,7 +128,32 @@ func request_device_status() -> void:
 	
 	var command_string := JSON.stringify(command)
 	command_sender.put_packet(command_string.to_ascii_buffer())
+	is_online = false
+	device_status_updated.emit()
+
 
 func update_device_status_from_response(response) -> void:
 	device_status = DeviceStatus.from_device_status_response(response)
+	is_online = true
 	device_status_updated.emit()
+
+
+func to_dict(include_device_status := false, only_device := false) -> Dictionary:
+	var data := {
+		"device": device
+	}
+	
+	if not only_device:
+		data["friendly"] = friendly
+		data["sku"] = sku
+		data["ip"] = ip
+	
+	if include_device_status:
+		data["device_status"] = device_status.to_dict()
+	
+	return data
+
+
+func update_friendly(new_friendly: String) -> void:
+	friendly = new_friendly
+	device_info_updated.emit()

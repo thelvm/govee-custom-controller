@@ -6,7 +6,13 @@ extends BoxContainer
 const DEVICE_VIEW = preload("uid://fj80gipotni7")
 
 
+func _ready() -> void:
+	update_device_views()
+
+
 func update_device_views():
+	if not devices_container:
+		return
 	for child in devices_container.get_children():
 		child.queue_free()
 	for device in govee_connector.devices:

@@ -11,6 +11,30 @@ grow_vertical = 2
 vertical = true
 script = ExtResource("1_px3n8")
 
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=511298160]
+layout_mode = 2
+
+[node name="DeviceFriendlyLabel" type="Label" parent="HBoxContainer" unique_id=94083699]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 0
+text = "DEVICE FRIENDLY NAME"
+
+[node name="DeviceFriendlyEdit" type="LineEdit" parent="HBoxContainer" unique_id=2064598526]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+flat = true
+
+[node name="OnlineStatusLabel" type="Label" parent="HBoxContainer" unique_id=729360856]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 8
+text = "ONLINE_STATUS"
+horizontal_alignment = 2
+
 [node name="DeviceInfo" type="BoxContainer" parent="." unique_id=524145780]
 layout_mode = 2
 
@@ -113,6 +137,8 @@ scrollable = false
 layout_mode = 2
 text = "Request status"
 
+[connection signal="gui_input" from="HBoxContainer/DeviceFriendlyLabel" to="." method="_on_device_friendly_label_gui_input"]
+[connection signal="editing_toggled" from="HBoxContainer/DeviceFriendlyEdit" to="." method="_on_device_friendly_edit_editing_toggled"]
 [connection signal="toggled" from="DeviceControls/OnOffButton" to="." method="set_power"]
 [connection signal="drag_ended" from="DeviceControls/BrightnessSlider" to="." method="handle_brightness_slider"]
 [connection signal="color_changed" from="DeviceControls/ColorPickerButton" to="." method="set_color"]

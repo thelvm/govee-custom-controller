@@ -3,7 +3,7 @@ extends RefCounted
 
 
 var on_off: bool = false
-var brighness: float = 0
+var brightness: float = 0
 var color: Color = Color.BLACK
 var temperature: int = 0
 
@@ -19,7 +19,7 @@ static func from_device_status_response(response: Dictionary) -> DeviceStatus:
 	else:
 		new_device_status.on_off = true
 	
-	new_device_status.brighness = int(data["brightness"])
+	new_device_status.brightness = int(data["brightness"])
 	
 	new_device_status.color.r8 = int(data["color"]["r"])
 	new_device_status.color.g8 = int(data["color"]["g"])
@@ -28,3 +28,16 @@ static func from_device_status_response(response: Dictionary) -> DeviceStatus:
 	new_device_status.temperature = int(data["colorTemInKelvin"])
 	
 	return new_device_status
+
+
+func to_dict() -> Dictionary:
+	return {
+		"onOff": on_off,
+		"brightness": brightness,
+		"color": {
+			"r": color.r,
+			"g": color.g,
+			"b": color.b
+		},
+		"temperature": temperature
+	}
